@@ -10,6 +10,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import StartupDashboard from "./pages/startup/Dashboard";
 import InvestorDashboard from "./pages/investor/Dashboard";
+import ExploreStartups from "./pages/investor/ExploreStartups";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +33,7 @@ const App = () => (
             
             {/* Investor Routes */}
             <Route path="/investor/dashboard" element={<InvestorDashboard />} />
+            <Route path="/investor/explore-startups" element={<ExploreStartups />} />
             
             {/* Catch-all Route */}
             <Route path="*" element={<NotFound />} />
