@@ -7,7 +7,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { BarChart as BarChartIcon, PieChart as PieChartIcon, TrendingUp, LineChart as LineChartIcon, Layers, BrainCircuit } from "lucide-react";
+import { 
+  BarChart as BarChartIcon, 
+  PieChart as PieChartIcon, 
+  TrendingUp, 
+  LineChart as LineChartIcon, 
+  Layers, 
+  BrainCircuit,
+  Check,
+  AlertTriangle,
+  Users
+} from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend, LineChart, Line } from "recharts";
 
 // Mock data - In a real app, this would come from the API

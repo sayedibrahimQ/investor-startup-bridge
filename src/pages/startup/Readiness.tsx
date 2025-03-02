@@ -1,13 +1,11 @@
-
 import { useState, useEffect } from "react";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowUp, ArrowDown, Check, AlertTriangle, Flag, LineChart, BarChart, PieChart } from "lucide-react";
+import { ArrowUp, ArrowDown, Check, AlertTriangle, Flag, LineChart, BarChart, PieChart, Users } from "lucide-react";
 
-// Mock data - In a real app, this would come from the API
 const mockReadinessData = {
   overallScore: 68,
   categories: [
@@ -47,7 +45,6 @@ const StartupReadiness = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate API call
     setTimeout(() => {
       setIsLoading(false);
     }, 1000);
