@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Search, Filter, Plus, Bookmark, X } from "lucide-react";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -430,7 +431,9 @@ export default function ExploreStartups() {
                     </div>
                   </CardContent>
                   <div className="px-6 pb-4">
-                    <Button className="w-full">View Details</Button>
+                    <Link to={`/investor/startup/${startup.id}`}>
+                      <Button className="w-full">View Details</Button>
+                    </Link>
                   </div>
                 </Card>
               ))}
@@ -519,7 +522,9 @@ export default function ExploreStartups() {
                         </div>
                       </div>
                       <div className="sm:w-24 self-center flex sm:flex-col gap-2">
-                        <Button className="flex-1 sm:w-full">View</Button>
+                        <Link to={`/investor/startup/${startup.id}`}>
+                          <Button className="flex-1 sm:w-full">View</Button>
+                        </Link>
                         <Button variant="outline" className="flex-1 sm:w-full">Contact</Button>
                       </div>
                     </div>

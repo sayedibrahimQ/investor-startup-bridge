@@ -1,9 +1,9 @@
 
+import { Link } from "react-router-dom";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, BarChart3, PieChart, TrendingUp } from "lucide-react";
-import { Link } from "react-router-dom";
 
 export default function InvestorDashboard() {
   return (
@@ -21,6 +21,7 @@ export default function InvestorDashboard() {
             <div className="space-y-4">
               {[
                 { 
+                  id: 1,
                   name: "GreenTech Solutions", 
                   industry: "CleanTech", 
                   score: 92,
@@ -29,6 +30,7 @@ export default function InvestorDashboard() {
                   seeking: "$3M"
                 },
                 { 
+                  id: 2,
                   name: "FinanceFlow", 
                   industry: "FinTech", 
                   score: 86,
@@ -37,6 +39,7 @@ export default function InvestorDashboard() {
                   seeking: "$2M"
                 },
                 { 
+                  id: 3,
                   name: "HealthPulse", 
                   industry: "HealthTech", 
                   score: 81,
@@ -44,8 +47,8 @@ export default function InvestorDashboard() {
                   raised: "$2.1M",
                   seeking: "$5M"
                 },
-              ].map((startup, index) => (
-                <div key={index} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-lg border border-border">
+              ].map((startup) => (
+                <div key={startup.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-lg border border-border">
                   <div className="mb-4 sm:mb-0">
                     <div className="flex items-center gap-2">
                       <h3 className="font-medium">{startup.name}</h3>
@@ -64,9 +67,11 @@ export default function InvestorDashboard() {
                     <Button variant="outline" size="sm">
                       Save
                     </Button>
-                    <Button size="sm">
-                      View Details
-                    </Button>
+                    <Link to={`/investor/startup/${startup.id}`}>
+                      <Button size="sm">
+                        View Details
+                      </Button>
+                    </Link>
                   </div>
                 </div>
               ))}
