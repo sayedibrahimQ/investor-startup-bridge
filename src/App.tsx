@@ -15,6 +15,7 @@ import Saved from "./pages/investor/Saved";
 // Startup pages
 import StartupDashboard from "./pages/startup/Dashboard";
 import ExploreInvestors from "./pages/startup/ExploreInvestors";
+import InvestorDetails from "./pages/startup/InvestorDetails";
 import Profile from "./pages/startup/Profile";
 import Readiness from "./pages/startup/Readiness";
 
@@ -36,6 +37,7 @@ function App() {
         {/* Startup routes */}
         <Route path="/startup/dashboard" element={<StartupDashboard />} />
         <Route path="/startup/explore-investors" element={<ExploreInvestors />} />
+        <Route path="/startup/investor/:id" element={<InvestorDetails />} />
         <Route path="/startup/profile" element={<Profile />} />
         <Route path="/startup/readiness" element={<Readiness />} />
         

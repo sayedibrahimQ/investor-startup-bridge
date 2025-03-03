@@ -1,658 +1,638 @@
+
 import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import DashboardLayout from "@/layouts/DashboardLayout";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
+import { Progress } from "@/components/ui/progress";
 import { 
-  ArrowLeft, 
-  Building, 
-  Users, 
-  Calendar, 
-  MapPin, 
   BarChart3, 
+  Calendar, 
+  CheckCircle, 
+  Clock, 
+  DollarSign, 
+  Globe, 
+  Mail, 
+  MessageSquare, 
+  Users, 
+  Award,
+  Building, 
   Bookmark,
-  FileText,
-  MessageSquare,
-  Globe,
-  Mail,
-  Phone,
-  DollarSign,
-  TrendingUp,
-  Award
+  AlertTriangle,
+  TrendingUp
 } from "lucide-react";
 
-// Mock data - would be fetched from API in production
-const MOCK_STARTUPS = [
-  {
+// Mock data for demo purposes - in a real app this would be fetched from API
+const startupData = {
+  "1": {
     id: 1,
     name: "GreenTech Solutions",
+    logo: "https://via.placeholder.com/150",
+    tagline: "Carbon capture technology with patented process that reduces costs by 40%.",
+    description: "GreenTech Solutions is developing a revolutionary carbon capture technology that leverages a patented chemical process to reduce the cost of carbon sequestration by up to 40%. Our technology can be retrofitted to existing industrial facilities, providing an immediate path to reducing carbon emissions without requiring completely new infrastructure.",
     industry: "CleanTech",
-    description: "Carbon capture technology with patented process that reduces costs by 40%.",
-    logo: "G",
-    fundingStage: "Seed",
-    fundingGoal: "$3M",
-    fundingRaised: "$1.2M",
     location: "San Francisco, CA",
-    foundedYear: 2020,
-    team: 12,
-    aiScore: 92,
-    tags: ["Sustainability", "CleanTech", "B2B"],
-    longDescription: "GreenTech Solutions has developed a revolutionary carbon capture technology that can be integrated into existing industrial systems. Our patented process reduces carbon capture costs by up to 40% compared to traditional methods, making it accessible to mid-sized manufacturing companies. We've completed successful pilot programs with 3 manufacturing plants and have LOIs from 7 additional companies. Our technology has been validated by the Climate Technology Research Institute and we're on track to reduce carbon emissions by 50,000 tons in our first year of full operation.",
-    founders: [
-      { name: "Sarah Chen, PhD", role: "CEO", background: "10 years in climate technology research, MIT" },
-      { name: "James Rodriguez", role: "CTO", background: "Former lead engineer at Tesla Energy" },
-      { name: "Michael Park", role: "COO", background: "Operations executive with experience scaling cleantech startups" }
-    ],
-    financials: {
-      burnRate: "$75K/month",
-      runway: "16 months",
-      revenueModel: "B2B SaaS + Hardware installation",
-      projectedRevenue: "$2.4M in Year 1, $8.5M in Year 2"
+    founded: "2020",
+    stage: "Seed",
+    employeeCount: 12,
+    website: "https://greentechsolutions.example.com",
+    contact: "contact@greentechsolutions.example.com",
+    readinessScore: 92,
+    funding: {
+      raised: "$1.2M",
+      seeking: "$3M",
+      valuation: "$12M",
+      equity: "15%",
+      previousRounds: [
+        { round: "Pre-seed", amount: "$500K", date: "Jun 2021", investors: ["Climate Ventures", "Green Angel Network"] },
+        { round: "Seed (ongoing)", amount: "$700K", date: "Apr 2023", investors: ["EcoInvest Capital", "Sustainable Future Fund"] }
+      ]
     },
-    traction: {
-      customers: 3,
-      pipeline: "$4.2M",
-      growth: "300% QoQ",
-      partnerships: ["ClimateForward Initiative", "Industrial Innovation Consortium"]
-    },
-    competitors: [
-      { name: "CarbonCapture Inc", strengths: "Larger scale installations", weaknesses: "60% higher cost" },
-      { name: "CleanAir Systems", strengths: "Government contracts", weaknesses: "Less efficient technology" }
+    team: [
+      { name: "Sarah Johnson", role: "CEO & Co-founder", bio: "Former researcher at MIT with 10+ years experience in environmental engineering." },
+      { name: "David Chen", role: "CTO & Co-founder", bio: "PhD in Chemical Engineering with 5 patents in carbon capture technology." },
+      { name: "Maria Rodriguez", role: "COO", bio: "15+ years in operations for climate tech companies, previously at Tesla Energy." }
     ],
-    contactInfo: {
-      email: "invest@greentechsolutions.com",
-      phone: "+1 (415) 555-7890",
-      website: "www.greentechsolutions.com"
-    }
+    metrics: {
+      traction: "Pilot programs with 3 major industrial manufacturers",
+      customers: "2 paid pilots, 5 LOIs signed",
+      revenue: "$150K ARR",
+      growthRate: "40% month-over-month",
+      carbonReduction: "Estimated 500 tons of CO2 captured monthly in current pilots"
+    },
+    strengths: [
+      "Patented technology with 40% cost reduction",
+      "Strong technical team with domain expertise",
+      "Successful pilot deployments with validated results"
+    ],
+    challenges: [
+      "Scaling manufacturing capacity",
+      "Regulatory hurdles in certain markets",
+      "Longer sales cycles with industrial clients"
+    ],
+    documents: [
+      { name: "Pitch Deck", type: "pdf", updated: "May 15, 2023" },
+      { name: "Financial Projections", type: "xlsx", updated: "Jun 2, 2023" },
+      { name: "Technical White Paper", type: "pdf", updated: "Apr 10, 2023" }
+    ],
+    updates: [
+      { date: "Jul 5, 2023", title: "Completed second pilot installation", content: "Successfully deployed our technology at a cement manufacturing facility in Portland." },
+      { date: "Jun 22, 2023", title: "Patent approved in EU market", content: "Our core technology received patent approval in the European Union." },
+      { date: "May 10, 2023", title: "New partnership announced", content: "Strategic partnership with ClimateAction Technologies to integrate our solutions." }
+    ]
   },
-  {
+  "2": {
     id: 2,
     name: "FinanceFlow",
+    logo: "https://via.placeholder.com/150",
+    tagline: "AI-powered financial planning platform for small businesses with 10K users.",
+    description: "FinanceFlow is an AI-driven financial planning and forecasting platform designed specifically for small businesses. Our solution combines accounting data with market intelligence to provide accurate cash flow projections, helping small businesses make better financial decisions and avoid cash flow problems before they occur.",
     industry: "FinTech",
-    description: "AI-powered financial planning platform for small businesses with 10K users.",
-    logo: "F",
-    fundingStage: "Pre-seed",
-    fundingGoal: "$2M",
-    fundingRaised: "$750K",
     location: "New York, NY",
-    foundedYear: 2021,
-    team: 8,
-    aiScore: 86,
-    tags: ["AI", "Finance", "SaaS"],
-    longDescription: "FinanceFlow is an AI-powered financial planning platform designed for small businesses. Our platform helps businesses automate budgeting, forecasting, and financial analysis, saving them time and money. We have 10,000 active users and are growing rapidly. Our AI algorithms provide personalized financial insights and recommendations, helping businesses make better decisions.",
-    founders: [
-      { name: "Alice Johnson", role: "CEO", background: "Ex-Goldman Sachs, MBA from Harvard" },
-      { name: "Bob Williams", role: "CTO", background: "AI expert, PhD from Stanford" },
-      { name: "Carol Davis", role: "COO", background: "Operations leader, previously at Google" }
-    ],
-    financials: {
-      burnRate: "$50K/month",
-      runway: "12 months",
-      revenueModel: "SaaS subscription",
-      projectedRevenue: "$1.8M in Year 1, $6M in Year 2"
+    founded: "2021",
+    stage: "Series A",
+    employeeCount: 28,
+    website: "https://financeflow.example.com",
+    contact: "info@financeflow.example.com",
+    readinessScore: 86,
+    funding: {
+      raised: "$750K",
+      seeking: "$2M",
+      valuation: "$8M",
+      equity: "20%",
+      previousRounds: [
+        { round: "Pre-seed", amount: "$250K", date: "Dec 2021", investors: ["TechStars", "Angel Investors"] },
+        { round: "Seed", amount: "$500K", date: "Nov 2022", investors: ["FinTech Ventures", "Innovation Capital"] }
+      ]
     },
-    traction: {
-      customers: 10000,
-      pipeline: "$2.5M",
-      growth: "200% QoQ",
-      partnerships: ["Small Business Association", "TechStars Accelerator"]
-    },
-    competitors: [
-      { name: "QuickBooks", strengths: "Established brand", weaknesses: "Lacks AI capabilities" },
-      { name: "Xero", strengths: "User-friendly interface", weaknesses: "Limited forecasting features" }
+    team: [
+      { name: "Michael Brown", role: "CEO & Founder", bio: "Former fintech product leader with experience at Square and Stripe." },
+      { name: "Jessica Wang", role: "CTO", bio: "Machine learning specialist with background in quantitative finance." },
+      { name: "Robert Smith", role: "Head of Sales", bio: "Built sales teams at three B2B SaaS startups with successful exits." }
     ],
-    contactInfo: {
-      email: "invest@financeflow.com",
-      phone: "+1 (212) 555-1234",
-      website: "www.financeflow.com"
-    }
+    metrics: {
+      traction: "10,000+ registered SMB users",
+      customers: "2,200 paying subscribers",
+      revenue: "$650K ARR",
+      growthRate: "25% month-over-month",
+      retentionRate: "92% monthly retention"
+    },
+    strengths: [
+      "Proprietary ML algorithms for cash flow prediction",
+      "Strong product-market fit with high retention",
+      "Capital efficient growth with positive unit economics"
+    ],
+    challenges: [
+      "Increasing CAC in competitive market",
+      "Building enterprise features for upmarket expansion",
+      "Integration complexity with legacy accounting systems"
+    ],
+    documents: [
+      { name: "Investor Presentation", type: "pdf", updated: "Jun 10, 2023" },
+      { name: "Market Analysis Report", type: "pdf", updated: "May 20, 2023" },
+      { name: "Product Roadmap", type: "pdf", updated: "Jun 5, 2023" }
+    ],
+    updates: [
+      { date: "Jul 1, 2023", title: "Launched premium subscription tier", content: "New enterprise features with advanced forecasting capabilities." },
+      { date: "Jun 15, 2023", title: "Reached 10,000 user milestone", content: "Celebrated 10K user mark with 25% MoM growth rate." },
+      { date: "May 28, 2023", title: "New partnership with QuickBooks", content: "Announced deep integration with QuickBooks for seamless data sync." }
+    ]
   },
-  {
+  "3": {
     id: 3,
     name: "HealthPulse",
+    logo: "https://via.placeholder.com/150",
+    tagline: "Remote patient monitoring system used by 15 hospitals with FDA clearance.",
+    description: "HealthPulse has developed a comprehensive remote patient monitoring platform that enables healthcare providers to track patient vitals and health metrics outside of traditional clinical settings. Our FDA-cleared system combines wearable devices with powerful analytics to detect deterioration early, reducing readmission rates and improving patient outcomes.",
     industry: "HealthTech",
-    description: "Remote patient monitoring system used by 15 hospitals with FDA clearance.",
-    logo: "H",
-    fundingStage: "Series A",
-    fundingGoal: "$5M",
-    fundingRaised: "$2.1M",
     location: "Boston, MA",
-    foundedYear: 2019,
-    team: 24,
-    aiScore: 81,
-    tags: ["Healthcare", "IoT", "B2B"],
-    longDescription: "HealthPulse is a remote patient monitoring system that enables hospitals to track patient health data in real-time. Our system is used by 15 hospitals and has FDA clearance. We use IoT devices to collect patient data and AI algorithms to identify potential health issues before they become critical. Our solution improves patient outcomes and reduces hospital costs.",
-    founders: [
-      { name: "David Lee", role: "CEO", background: "Medical doctor, MBA from Wharton" },
-      { name: "Emily Chen", role: "CTO", background: "IoT expert, PhD from MIT" },
-      { name: "Frank Garcia", role: "COO", background: "Healthcare operations, previously at Mayo Clinic" }
-    ],
-    financials: {
-      burnRate: "$100K/month",
-      runway: "18 months",
-      revenueModel: "B2B SaaS + Hardware sales",
-      projectedRevenue: "$3M in Year 1, $10M in Year 2"
+    founded: "2019",
+    stage: "Series B",
+    employeeCount: 45,
+    website: "https://healthpulse.example.com",
+    contact: "partnerships@healthpulse.example.com",
+    readinessScore: 81,
+    funding: {
+      raised: "$2.1M",
+      seeking: "$5M",
+      valuation: "$25M",
+      equity: "15%",
+      previousRounds: [
+        { round: "Seed", amount: "$800K", date: "Mar 2020", investors: ["Health Ventures", "Medical Angels"] },
+        { round: "Series A", amount: "$1.3M", date: "Feb 2022", investors: ["Healthtech Capital", "Innovation Partners"] }
+      ]
     },
-    traction: {
-      customers: 15,
-      pipeline: "$6M",
-      growth: "150% QoQ",
-      partnerships: ["Massachusetts General Hospital", "Cleveland Clinic"]
-    },
-    competitors: [
-      { name: "Teladoc", strengths: "Large user base", weaknesses: "Less focus on remote monitoring" },
-      { name: "Livongo", strengths: "Chronic disease management", weaknesses: "Limited device integration" }
+    team: [
+      { name: "Dr. James Wilson", role: "CEO & Co-founder", bio: "Cardiologist with 15 years of clinical experience and previous healthtech startup." },
+      { name: "Emily Chen", role: "CTO & Co-founder", bio: "Previously led engineering at a medical devices company with successful exit." },
+      { name: "Dr. Lisa Thompson", role: "Chief Medical Officer", bio: "Board-certified in internal medicine with focus on digital health integration." }
     ],
-    contactInfo: {
-      email: "invest@healthpulse.com",
-      phone: "+1 (617) 555-4567",
-      website: "www.healthpulse.com"
-    }
-  },
-  {
-    id: 4,
-    name: "EduSpark",
-    industry: "EdTech",
-    description: "Personalized learning platform with adaptive AI curriculum for K-12 students.",
-    logo: "E",
-    fundingStage: "Seed",
-    fundingGoal: "$1.5M",
-    fundingRaised: "$800K",
-    location: "Austin, TX",
-    foundedYear: 2020,
-    team: 10,
-    aiScore: 78,
-    tags: ["Education", "AI", "B2C"],
-    longDescription: "EduSpark is a personalized learning platform that uses adaptive AI curriculum for K-12 students. Our platform adjusts to each student's learning pace and style, providing a customized educational experience. We have seen significant improvements in student test scores and engagement. Our platform is used by several schools in Texas and we are expanding nationwide.",
-    founders: [
-      { name: "Grace Taylor", role: "CEO", background: "Former teacher, EdTech entrepreneur" },
-      { name: "Henry Martinez", role: "CTO", background: "AI and education expert, PhD from UT Austin" },
-      { name: "Ivy Nguyen", role: "COO", background: "Education operations, previously at Pearson" }
-    ],
-    financials: {
-      burnRate: "$40K/month",
-      runway: "20 months",
-      revenueModel: "B2C subscription",
-      projectedRevenue: "$1.2M in Year 1, $4M in Year 2"
+    metrics: {
+      traction: "Deployed in 15 hospitals and 30 clinics",
+      customers: "45 healthcare institutions as paying customers",
+      revenue: "$1.2M ARR",
+      growthRate: "20% quarter-over-quarter",
+      patientImpact: "Monitoring 12,000+ patients monthly"
     },
-    traction: {
-      customers: 5000,
-      pipeline: "$1M",
-      growth: "100% QoQ",
-      partnerships: ["Texas Education Agency", "Khan Academy"]
-    },
-    competitors: [
-      { name: "Khan Academy", strengths: "Free content", weaknesses: "Not personalized" },
-      { name: "Brainly", strengths: "Community-based learning", weaknesses: "Quality control issues" }
+    strengths: [
+      "FDA clearance and HIPAA compliance",
+      "Clinically validated with peer-reviewed studies",
+      "Strong network effect in healthcare markets"
     ],
-    contactInfo: {
-      email: "invest@eduspark.com",
-      phone: "+1 (512) 555-7890",
-      website: "www.eduspark.com"
-    }
-  },
-  {
-    id: 5,
-    name: "LogisticsAI",
-    industry: "Supply Chain",
-    description: "AI-optimized logistics platform reducing shipping costs by 22% for e-commerce.",
-    logo: "L",
-    fundingStage: "Series A",
-    fundingGoal: "$8M",
-    fundingRaised: "$3.5M",
-    location: "Chicago, IL",
-    foundedYear: 2018,
-    team: 35,
-    aiScore: 89,
-    tags: ["Logistics", "AI", "E-commerce"],
-    longDescription: "LogisticsAI is an AI-optimized logistics platform that reduces shipping costs by 22% for e-commerce businesses. Our platform uses machine learning to optimize shipping routes, predict demand, and automate warehouse operations. We have helped our clients save millions of dollars in shipping costs and improve their delivery times.",
-    founders: [
-      { name: "Jack Brown", role: "CEO", background: "Logistics expert, MBA from Kellogg" },
-      { name: "Kelly White", role: "CTO", background: "AI and logistics expert, PhD from UIUC" },
-      { name: "Larry Green", role: "COO", background: "Supply chain operations, previously at Amazon" }
+    challenges: [
+      "Long sales cycles in healthcare industry",
+      "Integration with legacy EHR systems",
+      "Navigating reimbursement landscapes"
     ],
-    financials: {
-      burnRate: "$150K/month",
-      runway: "24 months",
-      revenueModel: "B2B SaaS",
-      projectedRevenue: "$5M in Year 1, $15M in Year 2"
-    },
-    traction: {
-      customers: 50,
-      pipeline: "$10M",
-      growth: "80% QoQ",
-      partnerships: ["Shopify", "UPS"]
-    },
-    competitors: [
-      { name: "Flexport", strengths: "Global logistics network", weaknesses: "High costs" },
-      { name: "project44", strengths: "Real-time visibility", weaknesses: "Limited AI capabilities" }
+    documents: [
+      { name: "Clinical Validation Study", type: "pdf", updated: "Jun 1, 2023" },
+      { name: "Financial Projections", type: "xlsx", updated: "May 15, 2023" },
+      { name: "Product Development Roadmap", type: "pdf", updated: "Jun 10, 2023" }
     ],
-    contactInfo: {
-      email: "invest@logisticsai.com",
-      phone: "+1 (312) 555-5678",
-      website: "www.logisticsai.com"
-    }
-  },
-  {
-    id: 6,
-    name: "CyberShield",
-    industry: "Cybersecurity",
-    description: "Zero-trust security framework with ML-powered threat detection for enterprises.",
-    logo: "C",
-    fundingStage: "Seed",
-    fundingGoal: "$4M",
-    fundingRaised: "$1.8M",
-    location: "Seattle, WA",
-    foundedYear: 2021,
-    team: 15,
-    aiScore: 84,
-    tags: ["Security", "Enterprise", "ML"],
-    longDescription: "CyberShield offers a zero-trust security framework with ML-powered threat detection for enterprises. Our solution protects businesses from cyber attacks by continuously verifying every user and device. We use machine learning to identify and respond to threats in real-time. Our clients include Fortune 500 companies and government agencies.",
-    founders: [
-      { name: "Mandy Black", role: "CEO", background: "Cybersecurity expert, former NSA" },
-      { name: "Nick Blue", role: "CTO", background: "ML and security expert, PhD from CMU" },
-      { name: "Olivia Purple", role: "COO", background: "Enterprise sales, previously at Microsoft" }
-    ],
-    financials: {
-      burnRate: "$80K/month",
-      runway: "15 months",
-      revenueModel: "B2B SaaS",
-      projectedRevenue: "$2.5M in Year 1, $7M in Year 2"
-    },
-    traction: {
-      customers: 20,
-      pipeline: "$5M",
-      growth: "70% QoQ",
-      partnerships: ["Palo Alto Networks", "CrowdStrike"]
-    },
-    competitors: [
-      { name: "CrowdStrike", strengths: "Endpoint protection", weaknesses: "High cost" },
-      { name: "Okta", strengths: "Identity management", weaknesses: "Limited threat detection" }
-    ],
-    contactInfo: {
-      email: "invest@cybershield.com",
-      phone: "+1 (206) 555-9012",
-      website: "www.cybershield.com"
-    }
-  },
-  {
-    id: 7,
-    name: "AgroTech",
-    industry: "AgTech",
-    description: "Precision agriculture using drones and computer vision to increase crop yields.",
-    logo: "A",
-    fundingStage: "Pre-seed",
-    fundingGoal: "$1M",
-    fundingRaised: "$350K",
-    location: "Des Moines, IA",
-    foundedYear: 2022,
-    team: 6,
-    aiScore: 75,
-    tags: ["Agriculture", "Drones", "Computer Vision"],
-    longDescription: "AgroTech uses precision agriculture techniques with drones and computer vision to increase crop yields. Our drones collect data on crop health, soil conditions, and pest infestations. Our computer vision algorithms analyze this data to provide farmers with insights on how to optimize their farming practices. We have seen significant improvements in crop yields and reduced water usage.",
-    founders: [
-      { name: "Quinn Orange", role: "CEO", background: "Agriculture expert, farmer" },
-      { name: "Randy Yellow", role: "CTO", background: "Computer vision expert, PhD from Iowa State" },
-      { name: "Stacy Teal", role: "COO", background: "Agriculture operations" }
-    ],
-    financials: {
-      burnRate: "$30K/month",
-      runway: "10 months",
-      revenueModel: "B2B SaaS + Drone services",
-      projectedRevenue: "$800K in Year 1, $2.5M in Year 2"
-    },
-    traction: {
-      customers: 10,
-      pipeline: "$750K",
-      growth: "60% QoQ",
-      partnerships: ["John Deere", "Monsanto"]
-    },
-    competitors: [
-      { name: "Granular", strengths: "Farm management software", weaknesses: "Lacks drone integration" },
-      { name: "Climate FieldView", strengths: "Weather data", weaknesses: "Limited computer vision" }
-    ],
-    contactInfo: {
-      email: "invest@agrotech.com",
-      phone: "+1 (515) 555-3456",
-      website: "www.agrotech.com"
-    }
-  },
-  {
-    id: 8,
-    name: "RetailAI",
-    industry: "Retail",
-    description: "Customer behavior analytics platform using computer vision for brick-and-mortar.",
-    logo: "R",
-    fundingStage: "Seed",
-    fundingGoal: "$2.5M",
-    fundingRaised: "$1.1M",
-    location: "Los Angeles, CA",
-    foundedYear: 2020,
-    team: 11,
-    aiScore: 82,
-    tags: ["Retail", "Analytics", "Computer Vision"],
-    longDescription: "RetailAI provides a customer behavior analytics platform using computer vision for brick-and-mortar stores. Our platform tracks customer movements, identifies popular products, and optimizes store layouts. We help retailers increase sales and improve customer satisfaction. Our clients include major retail chains and boutique stores.",
-    founders: [
-      { name: "Uma Violet", role: "CEO", background: "Retail expert, MBA from UCLA" },
-      { name: "Victor Indigo", role: "CTO", background: "Computer vision expert, PhD from USC" },
-      { name: "Wendy Silver", role: "COO", background: "Retail operations, previously at Target" }
-    ],
-    financials: {
-      burnRate: "$60K/month",
-      runway: "18 months",
-      revenueModel: "B2B SaaS",
-      projectedRevenue: "$2M in Year 1, $6M in Year 2"
-    },
-    traction: {
-      customers: 15,
-      pipeline: "$3M",
-      growth: "90% QoQ",
-      partnerships: ["Walmart", "Shopify"]
-    },
-    competitors: [
-      { name: "Dor", strengths: "Foot traffic analytics", weaknesses: "Limited insights" },
-      { name: "RetailNext", strengths: "Comprehensive analytics", weaknesses: "High cost" }
-    ],
-    contactInfo: {
-      email: "invest@retailai.com",
-      phone: "+1 (213) 555-6789",
-      website: "www.retailai.com"
-    }
-  },
-];
+    updates: [
+      { date: "Jul 10, 2023", title: "New algorithm received FDA clearance", content: "Our predictive analytics module for cardiac patients received FDA clearance." },
+      { date: "Jun 20, 2023", title: "Partnership with major health system", content: "Signed contract with a 10-hospital health system in the Midwest." },
+      { date: "May 5, 2023", title: "Published research in JAMA", content: "Our clinical outcomes study was published in the Journal of the American Medical Association." }
+    ]
+  }
+};
 
 export default function StartupDetails() {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const startupId = parseInt(id || "1");
+  const { id } = useParams<{ id: string }>();
+  const [isBookmarked, setIsBookmarked] = useState(false);
   
-  // Find the startup details by ID
-  const startup = MOCK_STARTUPS.find(s => s.id === startupId) || MOCK_STARTUPS[0];
+  // In a real app, fetch the startup data from the API
+  const startup = id ? startupData[id as keyof typeof startupData] : null;
   
-  const [isSaved, setIsSaved] = useState(false);
+  if (!startup) {
+    return (
+      <DashboardLayout title="Startup Not Found">
+        <div className="flex flex-col items-center justify-center h-64">
+          <h2 className="text-xl font-semibold">Startup not found</h2>
+          <p className="text-muted-foreground mt-2">The startup you're looking for doesn't exist or you don't have access.</p>
+          <Button className="mt-4" variant="outline" onClick={() => window.history.back()}>
+            Go Back
+          </Button>
+        </div>
+      </DashboardLayout>
+    );
+  }
   
-  const toggleSave = () => {
-    setIsSaved(!isSaved);
-    // In a real app, this would call an API to save/unsave
+  const handleToggleBookmark = () => {
+    setIsBookmarked(!isBookmarked);
+    // In a real app, save this to the backend
   };
   
+  const handleRequestMeeting = () => {
+    // In a real app, implement meeting request functionality
+    console.log("Meeting requested with", startup.name);
+  };
+  
+  const handleContactStartup = () => {
+    // In a real app, implement contact or messaging functionality
+    console.log("Contacting startup", startup.name);
+  };
+
   return (
-    <DashboardLayout title={startup.name}>
+    <DashboardLayout title="Startup Details">
       <div className="space-y-6">
-        {/* Back button */}
-        <Button 
-          variant="ghost" 
-          className="mb-2 -ml-2" 
-          onClick={() => navigate(-1)}
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Startups
-        </Button>
-        
-        {/* Startup header */}
+        {/* Header with key information */}
         <Card>
           <CardContent className="p-6">
-            <div className="flex flex-col md:flex-row gap-6">
-              <div className="flex-shrink-0 h-24 w-24 rounded-md bg-accent text-accent-foreground flex items-center justify-center text-4xl font-semibold">
-                {startup.logo}
-              </div>
-              <div className="flex-1">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div>
-                    <h1 className="text-3xl font-bold">{startup.name}</h1>
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-sm text-muted-foreground">
-                      <div className="flex items-center">
-                        <Building className="mr-1 h-4 w-4" />
-                        {startup.industry}
-                      </div>
-                      <div className="flex items-center">
-                        <MapPin className="mr-1 h-4 w-4" />
-                        {startup.location}
-                      </div>
-                      <div className="flex items-center">
-                        <Calendar className="mr-1 h-4 w-4" />
-                        Founded {startup.foundedYear}
-                      </div>
-                      <div className="flex items-center">
-                        <Users className="mr-1 h-4 w-4" />
-                        {startup.team} team members
-                      </div>
+            <div className="flex flex-col lg:flex-row gap-6 lg:items-center">
+              <div className="flex gap-5 items-center">
+                <Avatar className="h-16 w-16 md:h-24 md:w-24">
+                  <AvatarImage src={startup.logo} />
+                  <AvatarFallback className="text-xl">{startup.name[0]}</AvatarFallback>
+                </Avatar>
+                <div>
+                  <div className="flex items-center gap-3">
+                    <h1 className="text-2xl md:text-3xl font-bold">{startup.name}</h1>
+                    <Badge variant="outline" className="text-sm">{startup.industry}</Badge>
+                  </div>
+                  <p className="text-muted-foreground mt-1">{startup.tagline}</p>
+                  <div className="flex items-center gap-3 mt-2 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                      <Globe className="h-4 w-4" />
+                      <span>{startup.location}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Building className="h-4 w-4" />
+                      <span>Founded {startup.founded}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Users className="h-4 w-4" />
+                      <span>{startup.employeeCount} employees</span>
                     </div>
                   </div>
-                  <div className="flex gap-3">
-                    <Button variant="outline" onClick={toggleSave}>
-                      <Bookmark className={`mr-2 h-4 w-4 ${isSaved ? "fill-primary text-primary" : ""}`} />
-                      {isSaved ? "Saved" : "Save"}
-                    </Button>
-                    <Button>
-                      <MessageSquare className="mr-2 h-4 w-4" />
-                      Contact
-                    </Button>
+                </div>
+              </div>
+              
+              <div className="lg:ml-auto flex flex-col sm:flex-row gap-3 mt-4 lg:mt-0">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleToggleBookmark}
+                  className={isBookmarked ? "text-accent" : ""}
+                >
+                  <Bookmark className="h-5 w-5" />
+                </Button>
+                <Button variant="outline" onClick={handleContactStartup}>
+                  <Mail className="mr-2 h-4 w-4" />
+                  Contact
+                </Button>
+                <Button onClick={handleRequestMeeting}>
+                  <Calendar className="mr-2 h-4 w-4" />
+                  Request Meeting
+                </Button>
+              </div>
+            </div>
+            
+            <div className="mt-6 pt-6 border-t border-border">
+              <div className="flex flex-col md:flex-row justify-between gap-6">
+                <div className="md:w-2/3">
+                  <h3 className="text-lg font-medium mb-2">Match Score</h3>
+                  <div className="flex items-center gap-4">
+                    <div className="w-full max-w-md">
+                      <Progress value={startup.readinessScore} className="h-3" />
+                    </div>
+                    <span className="text-lg font-bold text-accent">{startup.readinessScore}%</span>
                   </div>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Based on your investment criteria and the startup's business readiness.
+                  </p>
                 </div>
                 
-                <div className="flex flex-wrap gap-2 mt-4">
-                  {startup.tags.map((tag) => (
-                    <Badge key={tag} variant="secondary">
-                      {tag}
-                    </Badge>
-                  ))}
+                <div className="md:w-1/3 flex flex-col space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-sm text-muted-foreground">Funding Stage:</span>
+                    <span className="text-sm font-medium">{startup.stage}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-muted-foreground">Raised:</span>
+                    <span className="text-sm font-medium">{startup.funding.raised}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-muted-foreground">Seeking:</span>
+                    <span className="text-sm font-medium">{startup.funding.seeking}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-muted-foreground">Valuation:</span>
+                    <span className="text-sm font-medium">{startup.funding.valuation}</span>
+                  </div>
                 </div>
               </div>
             </div>
           </CardContent>
         </Card>
         
-        {/* AI Match Score Card */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="md:col-span-1 bg-accent/10">
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <BarChart3 className="mr-2 h-5 w-5 text-primary" />
-                AI Match Score
-              </CardTitle>
-              <CardDescription>
-                Based on your investment criteria
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center">
-                <div className="text-5xl font-bold mb-2 text-primary">
-                  {startup.aiScore}%
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  This startup matches your investment preferences
-                </div>
-                <div className="mt-6">
-                  <Button variant="outline" className="w-full">
-                    <Award className="mr-2 h-4 w-4" />
-                    View Match Analysis
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          {/* Funding Information */}
-          <Card className="md:col-span-2">
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <DollarSign className="mr-2 h-5 w-5" />
-                Funding Information
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                  <h3 className="text-sm font-medium text-muted-foreground">Current Round</h3>
-                  <p className="text-2xl font-bold">{startup.fundingStage}</p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-muted-foreground">Raised So Far</h3>
-                  <p className="text-2xl font-bold">{startup.fundingRaised}</p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-muted-foreground">Funding Goal</h3>
-                  <p className="text-2xl font-bold">{startup.fundingGoal}</p>
-                </div>
-              </div>
-              <Separator className="my-6" />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h3 className="text-sm font-medium text-muted-foreground">Burn Rate</h3>
-                  <p className="text-xl font-medium">{startup.financials.burnRate}</p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-muted-foreground">Runway</h3>
-                  <p className="text-xl font-medium">{startup.financials.runway}</p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-muted-foreground">Revenue Model</h3>
-                  <p className="text-xl font-medium">{startup.financials.revenueModel}</p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-muted-foreground">Projected Revenue</h3>
-                  <p className="text-xl font-medium">{startup.financials.projectedRevenue}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-        
         {/* Tabs for different sections */}
-        <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid grid-cols-4 md:w-[500px]">
+        <Tabs defaultValue="overview" className="space-y-6">
+          <TabsList className="grid grid-cols-4 md:grid-cols-6 lg:w-auto">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="team">Team</TabsTrigger>
-            <TabsTrigger value="traction">Traction</TabsTrigger>
-            <TabsTrigger value="competition">Competition</TabsTrigger>
+            <TabsTrigger value="metrics">Metrics</TabsTrigger>
+            <TabsTrigger value="funding">Funding</TabsTrigger>
+            <TabsTrigger value="documents">Documents</TabsTrigger>
+            <TabsTrigger value="updates">Updates</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="overview" className="mt-6 space-y-6">
+          {/* Overview Tab */}
+          <TabsContent value="overview" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>About {startup.name}</CardTitle>
+                <CardTitle>Company Overview</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-base">{startup.longDescription}</p>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle>Contact Information</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="flex items-center">
-                    <Mail className="mr-2 h-5 w-5 text-muted-foreground" />
-                    <a href={`mailto:${startup.contactInfo.email}`} className="text-primary hover:underline">
-                      {startup.contactInfo.email}
-                    </a>
+                <p className="text-foreground">{startup.description}</p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-6 mt-8">
+                  <div>
+                    <h3 className="font-medium mb-3 flex items-center gap-2">
+                      <CheckCircle className="h-5 w-5 text-green-500" />
+                      Strengths
+                    </h3>
+                    <ul className="space-y-2">
+                      {startup.strengths.map((strength, index) => (
+                        <li key={index} className="flex gap-2">
+                          <span className="text-green-500">•</span>
+                          <span>{strength}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                  <div className="flex items-center">
-                    <Phone className="mr-2 h-5 w-5 text-muted-foreground" />
-                    <a href={`tel:${startup.contactInfo.phone}`} className="text-primary hover:underline">
-                      {startup.contactInfo.phone}
-                    </a>
+                  
+                  <div>
+                    <h3 className="font-medium mb-3 flex items-center gap-2">
+                      <AlertTriangle className="h-5 w-5 text-amber-500" />
+                      Challenges
+                    </h3>
+                    <ul className="space-y-2">
+                      {startup.challenges.map((challenge, index) => (
+                        <li key={index} className="flex gap-2">
+                          <span className="text-amber-500">•</span>
+                          <span>{challenge}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                  <div className="flex items-center">
-                    <Globe className="mr-2 h-5 w-5 text-muted-foreground" />
-                    <a href={`https://${startup.contactInfo.website}`} className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">
-                      {startup.contactInfo.website}
-                    </a>
-                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
+                  <a 
+                    href={startup.website} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 p-3 border rounded-md hover:bg-accent/5 transition-colors"
+                  >
+                    <Globe className="h-5 w-5 text-muted-foreground" />
+                    <span className="text-sm font-medium">Visit Website</span>
+                  </a>
+                  
+                  <a 
+                    href={`mailto:${startup.contact}`}
+                    className="flex items-center gap-2 p-3 border rounded-md hover:bg-accent/5 transition-colors"
+                  >
+                    <Mail className="h-5 w-5 text-muted-foreground" />
+                    <span className="text-sm font-medium">Send Email</span>
+                  </a>
+                  
+                  <button 
+                    className="flex items-center gap-2 p-3 border rounded-md hover:bg-accent/5 transition-colors text-left"
+                    onClick={handleRequestMeeting}
+                  >
+                    <Calendar className="h-5 w-5 text-muted-foreground" />
+                    <span className="text-sm font-medium">Schedule Meeting</span>
+                  </button>
+                  
+                  <button 
+                    className="flex items-center gap-2 p-3 border rounded-md hover:bg-accent/5 transition-colors text-left"
+                    onClick={handleContactStartup}
+                  >
+                    <MessageSquare className="h-5 w-5 text-muted-foreground" />
+                    <span className="text-sm font-medium">Start Conversation</span>
+                  </button>
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
           
-          <TabsContent value="team" className="mt-6">
+          {/* Team Tab */}
+          <TabsContent value="team" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Founding Team</CardTitle>
+                <CardTitle>Leadership Team</CardTitle>
+                <CardDescription>Key team members and their backgrounds</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {startup.founders.map((founder, index) => (
-                    <Card key={index} className="border bg-card text-card-foreground">
-                      <CardContent className="p-6">
-                        <div className="w-16 h-16 rounded-full bg-accent text-accent-foreground flex items-center justify-center text-xl font-medium mb-4">
-                          {founder.name.charAt(0)}
-                        </div>
-                        <h3 className="text-lg font-semibold">{founder.name}</h3>
-                        <p className="text-sm text-primary mb-2">{founder.role}</p>
-                        <p className="text-sm text-muted-foreground">{founder.background}</p>
-                      </CardContent>
-                    </Card>
+                <div className="space-y-6">
+                  {startup.team.map((member, index) => (
+                    <div key={index} className="flex flex-col sm:flex-row gap-4 pb-5 border-b last:border-0 last:pb-0">
+                      <Avatar className="h-16 w-16">
+                        <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <h3 className="text-lg font-medium">{member.name}</h3>
+                        <p className="text-sm text-accent mb-2">{member.role}</p>
+                        <p className="text-muted-foreground">{member.bio}</p>
+                      </div>
+                    </div>
                   ))}
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
           
-          <TabsContent value="traction" className="mt-6">
+          {/* Metrics Tab */}
+          <TabsContent value="metrics" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Traction & Growth</CardTitle>
+                <CardTitle>Key Metrics</CardTitle>
+                <CardDescription>Performance indicators and traction</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <h3 className="text-lg font-medium mb-4">Key Metrics</h3>
-                    <div className="space-y-4">
-                      <div>
-                        <div className="flex justify-between text-sm mb-1">
-                          <span>Current Customers</span>
-                          <span className="font-medium">{startup.traction.customers}</span>
-                        </div>
-                        <div className="flex justify-between text-sm mb-1">
-                          <span>Sales Pipeline</span>
-                          <span className="font-medium">{startup.traction.pipeline}</span>
-                        </div>
-                        <div className="flex justify-between text-sm mb-1">
-                          <span>Growth Rate</span>
-                          <span className="font-medium">{startup.traction.growth}</span>
-                        </div>
+                  <div className="space-y-4">
+                    <div className="p-4 border rounded-lg">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Users className="h-5 w-5 text-muted-foreground" />
+                        <h3 className="font-medium">Traction</h3>
                       </div>
+                      <p>{startup.metrics.traction}</p>
+                    </div>
+                    
+                    <div className="p-4 border rounded-lg">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Building className="h-5 w-5 text-muted-foreground" />
+                        <h3 className="font-medium">Customers</h3>
+                      </div>
+                      <p>{startup.metrics.customers}</p>
                     </div>
                   </div>
                   
-                  <div>
-                    <h3 className="text-lg font-medium mb-4">Strategic Partnerships</h3>
-                    <ul className="list-disc pl-5 space-y-2">
-                      {startup.traction.partnerships.map((partner, index) => (
-                        <li key={index} className="text-sm">{partner}</li>
-                      ))}
-                    </ul>
+                  <div className="space-y-4">
+                    <div className="p-4 border rounded-lg">
+                      <div className="flex items-center gap-2 mb-1">
+                        <DollarSign className="h-5 w-5 text-muted-foreground" />
+                        <h3 className="font-medium">Revenue</h3>
+                      </div>
+                      <p>{startup.metrics.revenue}</p>
+                    </div>
+                    
+                    <div className="p-4 border rounded-lg">
+                      <div className="flex items-center gap-2 mb-1">
+                        <TrendingUp className="h-5 w-5 text-muted-foreground" />
+                        <h3 className="font-medium">Growth Rate</h3>
+                      </div>
+                      <p>{startup.metrics.growthRate}</p>
+                    </div>
+                  </div>
+                  
+                  {/* Additional metric specific to each startup */}
+                  <div className="p-4 border rounded-lg md:col-span-2">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Award className="h-5 w-5 text-muted-foreground" />
+                      <h3 className="font-medium">
+                        {startup.id === 1 
+                          ? "Carbon Reduction Impact" 
+                          : startup.id === 2 
+                            ? "Customer Retention" 
+                            : "Patient Impact"}
+                      </h3>
+                    </div>
+                    <p>
+                      {startup.id === 1 
+                        ? startup.metrics.carbonReduction 
+                        : startup.id === 2 
+                          ? startup.metrics.retentionRate 
+                          : startup.metrics.patientImpact}
+                    </p>
                   </div>
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
           
-          <TabsContent value="competition" className="mt-6">
+          {/* Funding Tab */}
+          <TabsContent value="funding" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Competitive Landscape</CardTitle>
+                <CardTitle>Funding History & Details</CardTitle>
+                <CardDescription>Current fundraising and previous rounds</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-6 grid-cols-1 md:grid-cols-4 mb-8">
+                  <div className="p-4 border rounded-lg">
+                    <h3 className="text-sm text-muted-foreground">Total Raised</h3>
+                    <p className="text-xl font-bold">{startup.funding.raised}</p>
+                  </div>
+                  <div className="p-4 border rounded-lg">
+                    <h3 className="text-sm text-muted-foreground">Current Round</h3>
+                    <p className="text-xl font-bold">{startup.funding.seeking}</p>
+                  </div>
+                  <div className="p-4 border rounded-lg">
+                    <h3 className="text-sm text-muted-foreground">Valuation</h3>
+                    <p className="text-xl font-bold">{startup.funding.valuation}</p>
+                  </div>
+                  <div className="p-4 border rounded-lg">
+                    <h3 className="text-sm text-muted-foreground">Equity Offered</h3>
+                    <p className="text-xl font-bold">{startup.funding.equity}</p>
+                  </div>
+                </div>
+                
+                <h3 className="font-medium mb-4">Previous Funding Rounds</h3>
+                <div className="space-y-4">
+                  {startup.funding.previousRounds.map((round, index) => (
+                    <div key={index} className="flex flex-col md:flex-row md:items-center gap-4 p-4 border rounded-lg">
+                      <div className="md:w-1/4">
+                        <h4 className="font-medium">{round.round}</h4>
+                        <span className="text-sm text-muted-foreground">{round.date}</span>
+                      </div>
+                      <div className="md:w-1/4">
+                        <span className="text-sm text-muted-foreground">Amount</span>
+                        <p className="font-medium">{round.amount}</p>
+                      </div>
+                      <div className="md:w-2/4">
+                        <span className="text-sm text-muted-foreground">Investors</span>
+                        <p>{round.investors.join(", ")}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          {/* Documents Tab */}
+          <TabsContent value="documents" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Documents</CardTitle>
+                <CardDescription>Financial projections, pitch decks, and other materials</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {startup.documents.map((doc, index) => (
+                    <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 bg-accent/10 rounded flex items-center justify-center">
+                          {doc.type === 'pdf' ? (
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-accent">
+                              <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                              <polyline points="14 2 14 8 20 8"/>
+                            </svg>
+                          ) : (
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-accent">
+                              <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                              <polyline points="14 2 14 8 20 8"/>
+                              <path d="M8 13h2"/>
+                              <path d="M8 17h2"/>
+                              <path d="M14 13h2"/>
+                              <path d="M14 17h2"/>
+                            </svg>
+                          )}
+                        </div>
+                        <div>
+                          <h3 className="font-medium">{doc.name}</h3>
+                          <p className="text-sm text-muted-foreground">
+                            {doc.type.toUpperCase()} • Last updated: {doc.updated}
+                          </p>
+                        </div>
+                      </div>
+                      <Button variant="outline" size="sm">
+                        View
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          {/* Updates Tab */}
+          <TabsContent value="updates" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Recent Updates</CardTitle>
+                <CardDescription>Latest news and developments from the startup</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
-                  {startup.competitors.map((competitor, index) => (
-                    <div key={index} className="p-4 rounded-lg border">
-                      <h3 className="text-lg font-medium mb-2">{competitor.name}</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <h4 className="text-sm font-medium text-muted-foreground mb-2">Strengths</h4>
-                          <p className="text-sm">{competitor.strengths}</p>
+                  {startup.updates.map((update, index) => (
+                    <div key={index} className="relative pl-6 pb-6 border-l border-border last:border-0 last:pb-0">
+                      <div className="absolute left-[-8px] top-0 h-4 w-4 rounded-full bg-background border-2 border-accent"></div>
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-muted-foreground">
+                            <Clock className="h-3 w-3 inline mr-1" />
+                            {update.date}
+                          </span>
                         </div>
-                        <div>
-                          <h4 className="text-sm font-medium text-muted-foreground mb-2">Weaknesses</h4>
-                          <p className="text-sm">{competitor.weaknesses}</p>
-                        </div>
+                        <h3 className="font-medium">{update.title}</h3>
+                        <p className="text-muted-foreground">{update.content}</p>
                       </div>
                     </div>
                   ))}

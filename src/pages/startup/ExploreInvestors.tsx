@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -386,9 +387,11 @@ const ExploreInvestors = () => {
                             {investor.description}
                           </p>
                           
-                          <Button variant="outline" className="w-full">
-                            View Details
-                          </Button>
+                          <Link to={`/startup/investor/${investor.id}`}>
+                            <Button variant="outline" className="w-full">
+                              View Details
+                            </Button>
+                          </Link>
                         </CardContent>
                       </Card>
                     ))}
@@ -475,9 +478,11 @@ const ExploreInvestors = () => {
                               {investor.description}
                             </p>
                             
-                            <Button variant="outline" className="w-full">
-                              View Details
-                            </Button>
+                            <Link to={`/startup/investor/${investor.id}`}>
+                              <Button variant="outline" className="w-full">
+                                View Details
+                              </Button>
+                            </Link>
                           </CardContent>
                         </Card>
                       ))}
